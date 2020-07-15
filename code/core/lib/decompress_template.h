@@ -31,11 +31,9 @@
  * target instruction sets.
  */
 #include <stdlib.h>
-#include <stdio.h>
 extern uint8_t** decompress_pointer;
 extern uint32_t buffer_size;
 int allocate_more(u8** out_end, u8** out_next, u8** out){
-	puts("allocate_more"); //TO DEL
 	(*out_end) += buffer_size;
 	buffer_size <<= 1;
 	uint8_t* old_decompress_pointer = *decompress_pointer;
@@ -43,11 +41,9 @@ int allocate_more(u8** out_end, u8** out_next, u8** out){
 	int offset = (int)(*decompress_pointer) - (int)old_decompress_pointer;
 	*out_next += offset;
 	*out += offset;
-	printf("old_p = %d, new_p = %d, new_size = %d", (int)old_decompress_pointer, (int)(*decompress_pointer), buffer_size);//TO DEL
 	return !!(*decompress_pointer);
 }
 
-#include <stdio.h>//TO DEL
 static enum libdeflate_result ATTRIBUTES
 FUNCNAME(struct libdeflate_decompressor * restrict d,
 	 const void * restrict in, size_t in_nbytes,
@@ -74,7 +70,6 @@ FUNCNAME(struct libdeflate_decompressor * restrict d,
 next_block:
 	/* Starting to read the next block.  */
 	;
-	printf("out = %d, end = %d\n", out_nbytes_avail, out_end);//TO DEL
 	STATIC_ASSERT(CAN_ENSURE(1 + 2 + 5 + 5 + 4));
 	ENSURE_BITS(1 + 2 + 5 + 5 + 4);
 
@@ -216,8 +211,7 @@ next_block:
 
 		SAFETY_CHECK(len == (u16)~nlen);
 		while (unlikely(len > out_end - out_next)){
-			printf("1)out = %d, end = %d\n", out_nbytes_avail, out_end);//TO DEL
-			if (!allocate_more(&out_end, &out_next, &out)) return LIBDEFLATE_INSUFFICIENT_SPACE;
+			if (!allocate_more(&out_end, &out_next, ((u8**)&out))) return LIBDEFLATE_INSUFFICIENT_SPACE;
 		}
 		SAFETY_CHECK(len <= in_end - in_next);
 
@@ -292,8 +286,7 @@ have_decode_tables:
 		if (entry & HUFFDEC_LITERAL) {
 			/* Literal  */
 			while (unlikely(out_next == out_end)){
-				printf("2)out = %d, end = %d\n", out_nbytes_avail, out_end);//TO DEL
-				if (!allocate_more(&out_end, &out_next, &out)) return LIBDEFLATE_INSUFFICIENT_SPACE;
+				if (!allocate_more(&out_end, &out_next, ((u8**)&out))) return LIBDEFLATE_INSUFFICIENT_SPACE;
 			}
 			*out_next++ = (u8)(entry >> HUFFDEC_RESULT_SHIFT);
 			continue;
@@ -317,8 +310,7 @@ have_decode_tables:
 		STATIC_ASSERT(HUFFDEC_END_OF_BLOCK_LENGTH == 0);
 		while (unlikely((size_t)length - 1 >= out_end - out_next)) {
 			if (unlikely(length != HUFFDEC_END_OF_BLOCK_LENGTH)){
-				printf("3)out = %d, end = %d\n", out_nbytes_avail, out_end);//TO DEL
-				if (!allocate_more(&out_end, &out_next, &out)) return LIBDEFLATE_INSUFFICIENT_SPACE;
+				if (!allocate_more(&out_end, &out_next, ((u8**)&out))) return LIBDEFLATE_INSUFFICIENT_SPACE;
 			}
 			else goto block_done;
 		}

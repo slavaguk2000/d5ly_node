@@ -33,8 +33,6 @@ function d5ly_decompress(compressedArray) {
 	var compressedArrayPointer = passArrayToWasm(compressedArray, len + 7);
 	var decompressedSize = d5ly._decompress(compressedArrayPointer, len);
 	decompressedArrayPointer = getInt32(compressedArrayPointer + len)
-	console.log(decompressedSize)
-	console.log(decompressedArrayPointer)
 	var decompressedArray = getArrayFromWasm(decompressedArrayPointer, decompressedSize).slice();
 	d5ly._free(compressedArrayPointer)
 	d5ly._free(decompressedArrayPointer)
@@ -47,10 +45,9 @@ function getRandomInt(max) {
 }
 
 function getSourceArray(){
-	var sourceArray = new Uint8Array(1000000000);
+	var sourceArray = new Uint8Array(100000);
 	for (var i = 0; i < sourceArray.length; i++)
-	sourceArray[i] = 0;
-	// sourceArray[i] = getRandomInt(100) + (255 - 100)/2;
+	sourceArray[i] = getRandomInt(100) + (255 - 100)/2;
 	return sourceArray
 }
 

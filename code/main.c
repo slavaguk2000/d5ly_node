@@ -12,7 +12,7 @@ int compress(int source, int source_size)
     uint8_t* pointer = (uint8_t*)source;
     return libdeflate_deflate_compress(compressor, pointer, source_size, pointer+source_size, source_size);
 }
-#include <stdio.h>
+
 uint8_t** decompress_pointer;
 uint32_t buffer_size;
 EMSCRIPTEN_KEEPALIVE
@@ -24,6 +24,6 @@ int decompress(int compressed, int compressed_size)
     buffer_size = compressed_size * 2;
     *decompress_pointer = (uint8_t*)malloc(buffer_size);
     size_t actual_size;
-    printf("resault = %d\n",libdeflate_deflate_decompress(decompressor, pointer, compressed_size, *decompress_pointer, buffer_size, &actual_size));
+    libdeflate_deflate_decompress(decompressor, pointer, compressed_size, *decompress_pointer, buffer_size, &actual_size);
     return actual_size;
 }
