@@ -67,9 +67,9 @@ function check_equality(sourceArray, decompressedArray){
 function battle_with_pako(){
 	var sourceArray = getSourceArray()
 	
-	console.time('pako')
+	console.time('pako_compress')
 	compr = pako.deflateRaw(sourceArray)
-	console.timeEnd('pako')
+	console.timeEnd('pako_compress')
 	console.log('size: ' + compr.length)
 
 	console.time('d5ly_compress')
@@ -77,12 +77,24 @@ function battle_with_pako(){
 	console.timeEnd('d5ly_compress')
 	console.log('size: ' + compressedArray.length)
 
-	console.time('nodejs_zlib')
+	console.time('nodejs_zlib_compress')
 	compr2 = zlib.deflateRawSync(sourceArray)
-	console.timeEnd('nodejs_zlib')
+	console.timeEnd('nodejs_zlib_compress')
 	console.log('size: ' + compr2.length)
 
+	console.time('pako_decompress')
+	decompressedArray = pako.inflateRaw(compr2)
+	console.timeEnd('pako_decompress')
+	check_equality(sourceArray, decompressedArray)
+
+	console.time('d5ly_decompress')
 	decompressedArray = d5ly_decompress(compr2)
+	console.timeEnd('d5ly_decompress')
+	check_equality(sourceArray, decompressedArray)
+
+	console.time('nodejs_zlib_decompress')
+	decompressedArray = zlib.inflateRawSync(compr2)
+	console.timeEnd('nodejs_zlib_decompress')
 	check_equality(sourceArray, decompressedArray)
 }
 
